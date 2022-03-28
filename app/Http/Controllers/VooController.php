@@ -15,6 +15,18 @@ class VooController extends Controller
         $this->service = $service;
     }
 
+    public function getVoos(){
+        return $this->service->getVoos();
+    }
+
+    public function getVoosIda(){
+        return $this->service->getVoosIda();
+    }
+
+    public function getVoosVolta(){
+        return $this->service->getVoosVolta();
+    }
+
     public function getVoosAgrupado(){
         return $this->service->getVoosAgrupado();
     }

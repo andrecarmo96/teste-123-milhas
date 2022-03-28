@@ -15,10 +15,10 @@ use App\Http\Controllers\VooController;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
 Route::prefix('voo')->group(function () {
+    Route::get('/', [VooController::class, 'getVoos']);
+    Route::get('/ida', [VooController::class, 'getVoosIda']);
+    Route::get('/volta', [VooController::class, 'getVoosVolta']);
     Route::get('/agrupado', [VooController::class, 'getVoosAgrupado']);
 });
 

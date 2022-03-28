@@ -12,14 +12,75 @@ class VooService {
         $this->repository = $repository;
     }
 
+    public function getVoos()
+    {
+        try {
+            return response()->json(
+                [
+                    'data' => $this->repository->getVoos(),
+                    'status' => true,
+                ],
+                200
+            );
+        } catch (\Throwable $e) {
+            return response()->json(
+                [
+                    'error' => $e->getMessage(),
+                    'status' => false,
+                ],
+                500
+            );
+        }
+    }
+
+    public function getVoosIda()
+    {
+        try {
+            return response()->json(
+                [
+                    'data' => $this->repository->getVoosIda(),
+                    'status' => true,
+                ],
+                200
+            );
+        } catch (\Throwable $e) {
+            return response()->json(
+                [
+                    'error' => $e->getMessage(),
+                    'status' => false,
+                ],
+                500
+            );
+        }
+    }
+
+    public function getVoosVolta()
+    {
+        try {
+            return response()->json(
+                [
+                    'data' => $this->repository->getVoosVolta(),
+                    'status' => true,
+                ],
+                200
+            );
+        } catch (\Throwable $e) {
+            return response()->json(
+                [
+                    'error' => $e->getMessage(),
+                    'status' => false,
+                ],
+                500
+            );
+        }
+    }
+    
     public function getVoosAgrupado(){
         try {
             $voos = $this->repository->getVoos();
 
             $idsGrupos = [];
             $grupos = [];
-            $cheapestPrice = '';
-            $cheapestGroup = '';
             
             foreach ($voos as $key => $value) {
                 
@@ -33,7 +94,7 @@ class VooService {
                         'inbound' => $value['inbound'] == 1 ? [$value['id']] : [],
                     ];
                 }else{
-                    $grupos[$id_grupo]['totalPrice'] += floatval($value['price']);
+                    $grupos[$id_grupo]['totalPrice'] += $value['price'];
                     if($value['outbound']){
                         $grupos[$id_grupo]['outbound'][] = $value['id'];
                     }else{
@@ -41,30 +102,33 @@ class VooService {
                     }
                 }
             }
-
-            foreach ($grupos as $key => $value) {
-                if(!$cheapestPrice){
-                    $cheapestPrice = $value['totalPrice'];
-                    $cheapestGroup = $value['uniqueId'];
-                }    
-
-                $cheapestPrice = $value['totalPrice'] < $cheapestPrice ? $value['totalPrice'] : $cheapestPrice;
-                $cheapestGroup = $value['totalPrice'] < $cheapestPrice ? $value['uniqueId'] : $cheapestGroup;
-            }
             
             $grupos = collect($grupos)->sortBy('totalPrice');
+            $cheapest = $grupos->first();
             $retorno = [
-                // 'flights' => $voos,
-                'groups' => $grupos->sortBy('totalPrice'),
+                'flights' => $voos,
+                'groups' => $grupos,
                 'totalGroups' => $grupos->count(),
                 'totalFlights' => $voos->count(),
-                'cheapestPrice' => $cheapestPrice,
-                'cheapestGroup' => $cheapestGroup,
+                'cheapestPrice' => $cheapest['totalPrice'],
+                'cheapestGroup' => $cheapest['uniqueId'],
             ];
-            
-            return response()->json($retorno, 200);
+
+            return response()->json(
+                [
+                    'data' => $retorno,
+                    'status' => true,
+                ],
+                200
+            );
         } catch (\Throwable $e) {
-            return response()->json($e->getMessage(), 500);
+            return response()->json(
+                [
+                    'error' => $e->getMessage(),
+                    'status' => false,
+                ],
+                500
+            );
         }
     }
 }
